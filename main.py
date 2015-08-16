@@ -14,7 +14,7 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 import webapp2
 
-TOKEN = 'YOUR_BOT_TOKEN_HERE'
+TOKEN = '134894567:AAGupjHqgmPczG3d6iWe6jCjAxWXV06YiL0'
 
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
@@ -87,7 +87,7 @@ class WebhookHandler(webapp2.RequestHandler):
             if msg:
                 resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
                     'chat_id': str(chat_id),
-                    'text': msg.encode('utf-8'),
+                    'text': msg.encode("utf-8"),
                     'disable_web_page_preview': 'true',
                     'reply_to_message_id': str(message_id),
                 })).read()
@@ -125,26 +125,22 @@ class WebhookHandler(webapp2.RequestHandler):
 
         # CUSTOMIZE FROM HERE
 
-        elif 'who are you' in text:
-            reply('telebot starter kit, created by yukuku: https://github.com/yukuku/telebot')
-        elif 'what time' in text:
-            reply('look at the top-right corner of your screen!')
-        else:
-            if getEnabled(chat_id):
-                try:
-                    resp1 = json.load(urllib2.urlopen('http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' + urllib.quote_plus(text.encode('utf-8'))))
-                    back = resp1.get('res')
-                except urllib2.HTTPError, err:
-                    logging.error(err)
-                    back = str(err)
-                if not back:
-                    reply('okay...')
-                elif 'I HAVE NO RESPONSE' in back:
-                    reply('you said something with no meaning')
-                else:
-                    reply(back)
-            else:
-                logging.info('not enabled for chat_id {}'.format(chat_id))
+        elif 'anmelden' in text.lower() and 'freitag' in text.lower():
+            reply(fr['first_name'] + " freitag angemeldet.")
+        elif 'anmelden' in text.lower() and 'dienstag' in text.lower():
+            reply(fr['first_name'] + " dienstag angemeldet.")
+        elif 'abmelden' in text.lower() and 'freitag' in text.lower():
+            reply(fr['first_name'] + " freitag abgemeldet.")
+        elif 'abmelden' in text.lower() and 'dienstag' in text.lower():
+            reply(fr['first_name'] + " dienstag abgemeldet.")
+        elif 'anmelden' in text.lower():
+            reply("Wann? (Dienstag/Freitag)")
+        elif 'abmelden' in text.lower():    
+            reply("Wann? (Dienstag/Freitag)")
+        elif 'dienstag' in text.lower():
+            reply('ok!')
+        elif 'freitag' in text.lower():
+            reply('ok!')
 
 
 app = webapp2.WSGIApplication([
