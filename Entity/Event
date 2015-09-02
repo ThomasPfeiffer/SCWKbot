@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+from google.appengine.ext import ndb
+
+class Event(ndb.Model):
+    name = ndb.StringProperty()
+    place = ndb.StringProperty()
+    date = ndb.DateTimeProperty()
+    
+    registeredUsers = ndb.KeyProperty(repeated = true)
+    cancelledUsers = ndb.KeyProperty(repeated = true)
+    
+
+def create(name, place, date):
+	event = Event(name=name, place=place, date = date)
+	user.put()
+	return user
+
+def registerUser(eventID, userKey):
+	event = getEvent(eventID)
+	if userKey in event.cancelledUsers
+		event.cancelledUsers.remove(userKey)
+	if userKey in event.registeredUsers
+		return true
+	event.registeredUsers.append(userKey)
+	return true
+
+def cancelUser(eventID, userKey):
+	event = getEvent(eventID)
+	if userKey in event.registeredUsers
+		event.registeredUsers.remove(userKey)
+	if userKey in event.cancelledUsers
+		return true
+	event.cancelledUsers.append(userKey)
+	return true
+
+def getByDate(date):
+	return Event.query(Event.date == date)
+
+def getEvent(eventID):
+	return Event.get_by_id(eventID)
