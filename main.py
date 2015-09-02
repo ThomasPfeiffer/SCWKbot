@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import StringIO
 import json
 import logging
@@ -26,8 +28,24 @@ class EnableStatus(ndb.Model):
     # key name: str(chat_id)
     enabled = ndb.BooleanProperty(indexed=False, default=False)
 
+class CurrentUpdate(ndb.Model):
+    # key name: str(chat_id)
+    updateID = ndb.IntegerProperty()
+
 
 # ================================
+
+def setCurrentUpdate(chatID, updateID):
+    logging.info('Setting current update for ' + str(chatID) + " to " + str(updateID))
+    update = CurrentUpdate.get_or_insert(str(chatID))
+    update.updateID = updateID
+    update.put()
+
+def getCurrentUpdate(chatID):
+    update = CurrentUpdate.get_by_id(str(chatID))
+    if update:
+        return update.updateID
+    return -1
 
 def setEnabled(yes):
     es = EnableStatus.get_or_insert(str(1))
@@ -98,6 +116,13 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info('send response:')
             logging.info(resp)
 
+        lastUpdate = getCurrentUpdate(chat_id)
+        if lastUpdate >= update_id:
+            logging.info('Already at update ' + str(lastUpdate))
+            return
+        else:
+            setCurrentUpdate(chat_id, update_id)
+
         # COMMANDS
         if text.startswith('/'):
             if text == '/start':
@@ -106,14 +131,6 @@ class WebhookHandler(webapp2.RequestHandler):
             elif text == '/stop':
                 reply('Bot disabled')
                 setEnabled(False)
-            elif text == '/image':
-                img = Image.new('RGB', (512, 512))
-                base = random.randint(0, 16777216)
-                pixels = [base+i*j for i in range(512) for j in range(512)]  # generate sample image
-                img.putdata(pixels)
-                output = StringIO.StringIO()
-                img.save(output, 'JPEG')
-                reply(img=output.getvalue())
             else:
                 reply('What command?')
 
@@ -122,9 +139,9 @@ class WebhookHandler(webapp2.RequestHandler):
             return
 
         # CUSTOMIZE FROM HERE
-        reply = UserTest.respondTo(message, chat_id)
-        if reply:
-            reply(reply)
+        rep = Test.UserTest.respondTo(message, chat_id)
+        if rep:
+            reply(rep)
 
 
 app = webapp2.WSGIApplication([
