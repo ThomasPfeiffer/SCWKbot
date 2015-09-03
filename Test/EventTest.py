@@ -42,4 +42,4 @@ def respondTo(message, chat_id):
 				return "Kein Event am " + dateString
 			userKey = Entity.User.getKey(senderID)
 			if event.registerUser(userKey):
-				return senderFirstName + " für " + event.name + " angemeldet."
+				return senderFirstName + " fuer " + event.name + " angemeldet."
