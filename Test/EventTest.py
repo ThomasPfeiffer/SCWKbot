@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import Entity.Event
+import Entity.User
 import datetime
 import re
 
@@ -26,17 +27,17 @@ def respondTo(message, chat_id):
 			return "Die Zeitangabe " + dateString + " ist nicht im richtigen Format. (TT.MM.JJJJ SS:MM)"
 		event = Entity.Event.getByDate(date)
 		if event:
-			return "Am gegebenen Datum existiert bereits ein Event: " + event.toString()		
+			return "Am gegebenen Datum existiert bereits ein Event: \n" + event.toString()		
 		event = Entity.Event.create(name, place, date)
-		return "Event erstellt: " + event.toString()
+		return "Event erstellt: \n" + event.toString()
 
 	if text.startswith("an"):
 		textSplit = text.lower().split()
-		command = textSplit[1]
+		command = textSplit[0]
 		if len(textSplit) > 1:
-			dateString = textSplit[2]
-			date = datetime.datetime.strptime(dateString, "%d.%m.%Y %H:%M").date()
-			event = Entity.event.getByDate(date)
+			dateString = textSplit[1]
+			date = datetime.datetime.strptime(dateString, "%d.%m.%Y").date()
+			event = Entity.Event.getByDate(date)
 			if not event:
 				return "Kein Event am " + dateString
 			userKey = Entity.User.getKey(senderID)
