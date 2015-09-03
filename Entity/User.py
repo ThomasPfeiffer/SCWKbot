@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 # ================================
 
 class User(ndb.Model):
-	firstName = ndb.StringProperty()
+	firstName = ndb.StringProperty(required = True)
 	chatID = ndb.StringProperty()
 
 	def toString(self):

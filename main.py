@@ -6,7 +6,7 @@ import logging
 import random
 import urllib
 import urllib2
-import Test.UserTest
+import Test.EventTest
 
 # for sending images
 from PIL import Image
@@ -139,7 +139,7 @@ class WebhookHandler(webapp2.RequestHandler):
             return
 
         # CUSTOMIZE FROM HERE
-        rep = Test.UserTest.respondTo(message, chat_id)
+        rep = Test.EventTest.respondTo(message, chat_id)
         if rep:
             reply(rep)
 

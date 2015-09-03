@@ -3,15 +3,7 @@ from datetime import datetime
 import re
 import random
 
-class Event():
-    eventName = None
-    eventPlace = None
-    registered = None
-    cancelled = None
-    eventTime = None
 
-    eventDate = None
-    repetitionEndDate = None
 
 class RegOrCanConversation():
     userID = None
