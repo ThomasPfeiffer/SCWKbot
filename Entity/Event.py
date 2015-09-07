@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
-
 import datetime
 
 class Event(ndb.Model):
@@ -37,12 +36,25 @@ def create(name, place, date):
 	event.put()
 	return event
 
-
+def deleteByDate(date):
+	event = getByDate(date)
+	if event:
+		event.key.delete()
+		return True
+	return False
 
 def getByDate(date):
 	minimum = datetime.datetime.combine(date, datetime.datetime.min.time())
 	maximum = datetime.datetime.combine(date, datetime.datetime.max.time())
 	return Event.query(ndb.AND(Event.date >= minimum, Event.date <= maximum)).get()
 
+def getNextEvent():
+	event = Event.query().order(-Event.date).fetch(1)
+	if event:
+		if event.date < datetime.datetime.now().date():
+			return None
+	return event
+
 def get(eventID):
 	return Event.get_by_id(eventID)
+

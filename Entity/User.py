@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from google.appengine.ext import ndb
 
 # ================================
@@ -7,6 +6,7 @@ from google.appengine.ext import ndb
 class User(ndb.Model):
 	firstName = ndb.StringProperty(required = True)
 	chatID = ndb.StringProperty()
+	admin = ndb.BooleanProperty(default = False)
 
 	def toString(self):
 		return "first name: " + self.firstName + ", chatID: " + self.chatID
@@ -19,7 +19,7 @@ def create(userID, firstName, chatID):
 	user.put()
 	return user
 
-def getUser(userID):
+def get(userID):
 	return User.get_by_id(userID)
 
 def delete(userID):

@@ -6,6 +6,7 @@ import logging
 import random
 import urllib
 import urllib2
+import responder
 import Test.EventTest
 
 # for sending images
@@ -24,9 +25,10 @@ BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
 # ================================
 
-class EnableStatus(ndb.Model):
-    # key name: str(chat_id)
-    enabled = ndb.BooleanProperty(indexed=False, default=False)
+class Setting(ndb.Model):
+    value = ndb.StringProperty()
+    _use_memcache = False
+    _use_cache = False
 
 class CurrentUpdate(ndb.Model):
     # key name: str(chat_id)
@@ -48,14 +50,22 @@ def getCurrentUpdate(chatID):
     return -1
 
 def setEnabled(yes):
-    es = EnableStatus.get_or_insert(str(1))
-    es.enabled = yes
-    es.put()
+    setting = Setting.get_or_insert('enabled')
+    setting.value = yes
+    setting.put()
 
 def getEnabled():
-    es = EnableStatus.get_by_id(str(1))
-    if es:
-        return es.enabled
+    setting = Setting.get_by_id('enabled')
+    if setting:
+        return setting.value == 'True'
+    return False
+
+def getUserRegistrationEnabled():
+    userRegistry = Setting.get_by_id('userRegistry')
+    if userRegistry:
+        logging.info("hier")
+        logging.info(userRegistry.key.get().value)
+        return userRegistry.value
     return False
 
 
@@ -127,19 +137,20 @@ class WebhookHandler(webapp2.RequestHandler):
         if text.startswith('/'):
             if text == '/start':
                 reply('Bot enabled')
-                setEnabled(True)
+                setEnabled('True')
+                return
             elif text == '/stop':
                 reply('Bot disabled')
-                setEnabled(False)
-            else:
-                reply('What command?')
+                setEnabled('False')
+                return
 
         # END COMMANDS
         if not getEnabled():
+            logging.info('Bot is disabled')
             return
 
         # CUSTOMIZE FROM HERE
-        rep = Test.EventTest.respondTo(message, chat_id)
+        rep = responder.respondTo(message, chat_id)
         if rep:
             reply(rep)
 
