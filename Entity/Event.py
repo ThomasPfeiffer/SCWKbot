@@ -2,6 +2,16 @@
 from google.appengine.ext import ndb
 import datetime
 
+DAY_DICT = {
+	'montag' : 0,
+	'dienstag' : 1,
+	'mittwoch' : 2,
+	'donnerstag' : 3,
+	'freitag' : 4,
+	'samstag' : 5,
+	'sonntag' : 6
+	}
+
 class Event(ndb.Model):
 	name = ndb.StringProperty(required = True)
 	place = ndb.StringProperty()
@@ -49,12 +59,21 @@ def getByDate(date):
 	return Event.query(ndb.AND(Event.date >= minimum, Event.date <= maximum)).get()
 
 def getNextEvent():
-	event = Event.query().order(-Event.date).fetch(1)
+	event = Event.query().order(-Event.date).get()
 	if event:
-		if event.date < datetime.datetime.now().date():
+		if event.date < datetime.datetime.now():
 			return None
 	return event
 
 def get(eventID):
 	return Event.get_by_id(eventID)
 
+def getNextByDay(day):
+	d = datetime.date.today()
+	i = 0
+	while d.weekday() != DAY_DICT[day]:
+		 d += datetime.timedelta(1)
+		 i += 1
+		 if i > 10:
+		 	break
+	getByDate(d)

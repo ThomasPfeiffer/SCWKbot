@@ -19,6 +19,15 @@ def create(userID, firstName, chatID):
 	user.put()
 	return user
 
+def update(userID, firstName, chatID):
+	user = get(userID)
+	if user:
+		if user.firstName != firstName or user.chatID != chatID:
+			user.firstName = firstName
+			user.chatID = chatID
+			user.put()
+	return user
+
 def get(userID):
 	return User.get_by_id(userID)
 

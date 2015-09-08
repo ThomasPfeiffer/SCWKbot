@@ -2,8 +2,8 @@
 from datetime import datetime
 import re
 import random
-import Entity.User
-import Entity.Event
+import Entity.User as User
+import Entity.Event as Event
 import Logic.UserController as UserController
 import main
 from google.appengine.ext import ndb
@@ -21,38 +21,34 @@ def respondTo(message, sender):
 	chat_id = str(chat['id'])
 
 	# For dev
-	if text.startswith('/setUser'):
-		split = text.split(' ',3)
-		user = Entity.User.get(split[1])
-		if not user:
-			senderFirstName = 'Testuser'
-			chat_id = split[1]
-		else:
-			senderFirstName = user.firstName
-			chat_id = user.chat_id
-		senderID = split[1]
-		text = split[2]
+	if '/setName' in text:
+		split = text.split()
+		senderFirstName = split[split.index('/setName')+1]
+		del split[split.index('/setName')+1]
+		split.remove('/setName')
+		text = ' '.join(split)
 
-	user = UserController.getOrCreate(senderID, senderFirstName, chat_id)
+	if '/setUser' in text:
+		split = text.split()
+		senderID = split[split.index('/setUser')+1]
+		del split[split.index('/setUser')+1]
+		split.remove('/setUser')
+		text = ' '.join(split)
 
-	return u'Hola ' + user.firstName
+	user = UserController.createOrUpdate(senderID, senderFirstName, chat_id)
+	textLower = text.lower()
+	textLowerSplit = textLower.split(' ' , 2)
+	command = textLowerSplit[0]
+	additional = None
+	if len(textLowerSplit) > 1:
+		additional = textLowerSplit[1]
 
-	# message.get('text') = split[2]
+	if command.startswith('an'):
+		return UserController.registerForEvent(user, additional)
 
+	if command.startswith('ab'):
+		return UserController.cancelForEvent(user, additional)
 
-	# messageSplit = message.lower().split()
-	# if len(messageSplit) < 1:
-	# 	return
+	
+	return u'Folgende befehle sind möglich: \n\t an -> anmelden \n\t ab -> abmelden \n\t info -> Informationen zu einem Event \n Zusätzlich kann ein bestimmter Tag (z.B. "Montag") oder ein Datum (TT.MM.JJJJ) angegeben werden.'
 
-	# command = messageSplit[0]
-	# if len(messageSplit) > 1:
-	# 	event = getEvent(messageSplit[1])
-	# if command.startswith('an') or command.startswith('ab'):			
-	# 	if(event):
-	# 		if command.startswith('an'):
-	# 			return register(sender, event)
-	# 		if command.startswith('ab'):
-	# 			return cancel(sender, event)
-	# 	else:
-	# 		return requestEvent(sender)
-	return "Folgende befehle sind möglich: \n\tanmelden 'Wochentag' - für nächstes event am angegebenen Wochentag anmelden\n\tabmelden 'Wochentag' - für nächstes event am angegebenen Wochentag anmelden\n\tanmelden 'TT.MM.JJJJ' - für event am angegebenen Datum anmelden\n\tabmelden 'TT.MM.JJJJ' - für event am angegebenen Datum anmelden\n\tanmelden - Liste mit nächsten Events zur Anmeldung\n\tanmelden - Liste mit nächsten Events zur Abmeldung\n\tstatus 'Wochentag' - An- und Abmeldungen nächstes Event am angegebenen Wochentag abrufen\n\tstatus 'TT.MM.JJJJ' - An- und Abmeldungen für Event am angegebenen Datum abrufen\n\tstatus - An- und Abmeldungen für nächstes Event abrufen\n\terstellen 'TT.MM.JJJJ' Event an gegebenem Datum erstellen\n\tabsagen 'TT.MM.JJJJ' Event an gegebenem Datum löschen\n"
