@@ -25,12 +25,17 @@ def respondTo(message, sender):
 		split = text.split(' ',3)
 		user = Entity.User.get(split[1])
 		if not user:
-			return u'Error, no user with ID ' + split[1] + u' found'
-		senderID = user.key.id()
-		senderFirstName = user.firstName
+			senderFirstName = 'Testuser'
+			chat_id = split[1]
+		else:
+			senderFirstName = user.firstName
+			chat_id = user.chat_id
+		senderID = split[1]
 		text = split[2]
 
-	return u'Registration: ' + main.getUserRegistrationEnabled()
+	user = UserController.getOrCreate(senderID, senderFirstName, chat_id)
+
+	return u'Hola ' + user.firstName
 
 	# message.get('text') = split[2]
 
