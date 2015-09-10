@@ -9,6 +9,7 @@ import main
 from google.appengine.ext import ndb
 
 
+
 def respondTo(message, sender):
 
 	message_id = message.get('message_id')
