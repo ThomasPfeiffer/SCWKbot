@@ -39,7 +39,7 @@ class Event(ndb.Model):
 		return True
 
 	def toString(self):
-		return "Name: " + self.name + "\n Ort: " + self.place + "\n Zeit: " + str(self.date)
+		return "Name: " + self.name + "\n Ort: " + self.place + "\n Zeit: " + self.date.strftime("%d.%m.%Y %H:%M")
 
 def create(name, place, date):
 	event = Event(name=name, place=place, date = date)
@@ -65,15 +65,11 @@ def getNextEvent():
 			return None
 	return event
 
+def getNext(amount):
+	events = Event.query().order(-Event.date).fetch(amount)
+	return events
+
 def get(eventID):
 	return Event.get_by_id(eventID)
 
-def getNextByDay(day):
-	d = datetime.date.today()
-	i = 0
-	while d.weekday() != DAY_DICT[day]:
-		 d += datetime.timedelta(1)
-		 i += 1
-		 if i > 10:
-		 	break
-	getByDate(d)
+

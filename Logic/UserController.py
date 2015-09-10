@@ -14,10 +14,13 @@ def createOrUpdate(senderID, senderFirstName, chat_id):
 	return user
 
 def registerForEvent(user, additional):
-	return regOrCancel(user, additional, True)
+	return regOrCancel(user, additional, 0)
 
 def cancelForEvent(user, additional):
-	return regOrCancel(user, additional, False)
+	return regOrCancel(user, additional, 1)
+
+def infoForEvent(user, additional):
+	return regOrCancel(user, additional, 2)
 
 
 def getDateByDay(day):
@@ -30,7 +33,9 @@ def getDateByDay(day):
 		 	break
 	return d
 
-def regOrCancel(user, additional, reg):
+def regOrCancel(user, additional, action):
+
+	event = None
 	if not additional:
 		event = Event.getNextEvent()
 		if not event:
@@ -51,12 +56,27 @@ def regOrCancel(user, additional, reg):
 		except ValueError:
 			pass
 	if event:
-		if reg:
+		if action == 0:
 			event.registerUser(user.key)
 			return user.firstName + u' für ' + event.name + u' am ' + event.date.strftime("%d.%m.%Y %H:%M") + u' angemeldet.'
-		else:
+		elif action == 1:
 			event.cancelUser(user.key)
 			return user.firstName + u' für ' + event.name + u' am ' + event.date.strftime("%d.%m.%Y %H:%M") + u' abgemeldet.'
+		elif action == 2:
+			return event.toString()
+
+	if action == 2:
+		try:
+			amount = int(additional)
+			events = Event.getNext(amount)
+			answer = u'Die nächsten ' + additional + ' Events: \n\n'
+			for e in events:
+				answer += e.toString() 
+				answer += u'\n\n'
+			return answer
+		except ValueError:
+			pass
+
 	
 	return additional + u' ist keine gültige Eingabe. Möglich sind: \n\tKeine Angabe->Nächstes event\n\tWochentag->Event an diesem Tag\n\tDatum(TT.MM.JJJ)->Event an diesem Datum'
 		

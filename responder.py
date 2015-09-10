@@ -50,6 +50,9 @@ def respondTo(message, sender):
 	if command.startswith('ab'):
 		return UserController.cancelForEvent(user, additional)
 
+	if command.startswith('info'):
+		return UserController.infoForEvent(user, additional)
+
 	
 	return u'Folgende befehle sind möglich: \n\t an -> anmelden \n\t ab -> abmelden \n\t info -> Informationen zu einem Event \n Zusätzlich kann ein bestimmter Tag (z.B. "Montag") oder ein Datum (TT.MM.JJJJ) angegeben werden.'
 
