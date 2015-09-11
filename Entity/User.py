@@ -37,3 +37,10 @@ def delete(userID):
 def getKey(userID):
 	return ndb.Key(User, userID)
 
+def setAdmin(userID, value):
+	user = get(userID)
+	if user:
+		user.admin = value
+		user.put()
+		return True
+

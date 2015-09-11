@@ -6,8 +6,9 @@ import logging
 import random
 import urllib
 import urllib2
-import responder
+import Logic.Responder as Responder
 import Entity.User
+import Logic.UserController as UserController
 import Test.EventTest
 
 # for sending images
@@ -145,9 +146,18 @@ class WebhookHandler(webapp2.RequestHandler):
 				setSetting('userRegistration', 'False')
 				return
 			if text.startswith('/deleteUser '):
-				Entity.User.delete(text.split()[1])
-				reply(u'User ' + text.split()[1] + u' deleted.')
-				return
+				if UserController.deleteUser(str(fr['id']) , text.split()[1]):
+					reply(u'User ' + text.split()[1] + u' deleted.')
+					return
+			if text.startswith('/setAdmin'):
+				split = text.split()
+				if len(split) == 3:
+					if UserController.setAdmin(str(fr['id']), split[1], (split[2] == 'True')):
+						reply(u'User ' + split[1] + u' admin set to ' + split[2])
+						return
+					else:
+						logging.warn("Set Admin request by " + str(fr['id']) + " not successful.")
+
 
 
 		# END COMMANDS
@@ -156,7 +166,7 @@ class WebhookHandler(webapp2.RequestHandler):
 			return
 
 		# CUSTOMIZE FROM HERE
-		rep = responder.respondTo(message, chat_id)
+		rep = Responder.respondTo(message, chat_id)
 		if rep:
 			reply(rep)
 
