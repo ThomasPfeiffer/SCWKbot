@@ -88,5 +88,5 @@ def respondTo(message, sender):
 	
 
 	
-	return u'Folgende befehle sind möglich: \n\t an -> anmelden \n\t ab -> abmelden \n\t info -> Informationen zu einem Event \n Zusätzlich kann ein bestimmter Tag (z.B. "Montag") oder ein Datum (TT.MM.JJJJ) angegeben werden.'
+	return u'Folgende befehle sind möglich: \n\t an -> anmelden \n\t ab -> abmelden \n\t info (x)-> Informationen zu einem (oder X) Event(s) \n Zusätzlich kann ein bestimmter Tag (z.B. "Montag") oder ein Datum (TT.MM.JJJJ) angegeben werden. Wird nichts angegeben, wird das nächste Training/Spiel genommen.'
 

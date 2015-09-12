@@ -5,6 +5,7 @@ from datetime import timedelta
 import re
 import Entity.User as User
 import Entity.Event as Event
+import Responder
 
 
 def create(user, additional):
@@ -18,7 +19,7 @@ def create(user, additional):
 	try:
 		date = datetime.strptime(dateString, "%d.%m.%Y %H:%M")
 	except ValueError as err:
-		return u'Die Zeitangabe ' + dateString + u' ist nicht im richtigen Format. (TT.MM.JJJJ SS:MM)'
+		return u'Die Zeitangabe ' + dateString + u' ist nicht im richtigen Format. (TT.MM.JJJJ HH:MM)'
 	event = Event.getByDate(date)
 	if event:
 		return u'Am gegebenen Datum existiert bereits ein Event: \n' + event.toString()		
@@ -26,4 +27,11 @@ def create(user, additional):
 	return u'Event erstellt: \n' + event.toString()
 
 def delete(user, additional):
-	return u'TODO'
+	result = Responder.parseEvent(user, additional)
+	if isinstance(result,Event.Event):
+			date = result.date
+			name = result.name
+			result.key.delete()
+			return u' Event ' + name + u' am ' + date.strftime("%d.%m.%Y %H:%M") + u' gelöscht.'
+	if isinstance(result,basestring):
+		return result

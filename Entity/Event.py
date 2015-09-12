@@ -59,14 +59,11 @@ def getByDate(date):
 	return Event.query(ndb.AND(Event.date >= minimum, Event.date <= maximum)).get()
 
 def getNextEvent():
-	event = Event.query().order(-Event.date).get()
-	if event:
-		if event.date < datetime.datetime.now():
-			return None
+	event = Event.query(Event.date >= datetime.datetime.now()).order(Event.date).get()
 	return event
 
 def getNext(amount):
-	events = Event.query().order(-Event.date).fetch(amount)
+	events = Event.query(Event.date >= datetime.datetime.now()).order(Event.date).fetch(amount)
 	return events
 
 def get(eventID):
