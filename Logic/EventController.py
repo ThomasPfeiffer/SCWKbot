@@ -47,6 +47,8 @@ def create(user, additional):
 		return createSingleEvent(name, place, datetime.combine(date, time))
 	except ValueError as err:
 		try:
+			if dateOrDayString:
+				dateOrDayString = dateOrDayString.lower()
 			day = Event.DAY_DICT[dateOrDayString]
 			return createRepeatingEvent(name, place, dateOrDayString, time)
 		except KeyError:

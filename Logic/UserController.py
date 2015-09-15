@@ -50,7 +50,12 @@ def infoForEvent(user, additional):
 		try:
 			amount = int(additional)
 			events = Event.getNext(amount)
-			answer = u'Die nächsten ' + additional + ' Events: \n\n'
+			answer = ''
+			if not events:
+				return u'Es konnte kein in Zukunft stattfindendes Event gefunden werden. Ein Administrator muss erst eines anlegen.'
+			if len(events) < amount:
+				answer += u'Es wurden nur ' + str(len(events)) + u' zukünftige Events gefunden. ' 
+			answer += u'Die nächsten ' + str(len(events)) + ' Events: \n\n'
 			for e in events:
 				answer += e.toString() 
 				answer += u'\n\n'
