@@ -8,8 +8,10 @@ import urllib
 import urllib2
 import Logic.Responder as Responder
 import Entity.User
+import Entity.Event
 import Logic.UserController as UserController
 import Test.EventTest
+import datetime
 
 # for sending images
 from PIL import Image
@@ -60,6 +62,32 @@ def getSetting(setting):
 		return s.value
 
 # ================================
+
+def send(msg, chat_id):
+			if msg:
+				resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+					'chat_id': str(chat_id),
+					'text': msg.encode("utf-8"),
+					'disable_web_page_preview': 'true',
+				})).read()
+			else:
+				logging.error('no msg specified')
+				resp = None
+
+			logging.info('send response:')
+			logging.info(resp)
+
+class ReminderHandler(webapp2.RequestHandler):
+	def get(self):
+		event = Entity.Event.getNextEvent()
+		if event and not event.reminderSent:
+			if event.date <= datetime.datetime.now() + datetime.timedelta(hours=12):
+				allUsers = Entity.User.getAll()
+				for user in allUsers:
+					if user.key not in event.registeredUsers and user.key not in event.cancelledUsers:
+						send(u'Du hast dich noch nicht für ein bald stattfindendes Event an- oder abgemeldet: \n' + event.toString() + u'\n\n Bitte antworte mit an oder ab um dich an- oder abzumelden.' , user.chatID)
+				event.reminderSent = True
+				event.put()
 
 class MeHandler(webapp2.RequestHandler):
 	def get(self):
@@ -192,10 +220,10 @@ class WebhookHandler(webapp2.RequestHandler):
 		if rep:
 			reply(rep)
 
-
 app = webapp2.WSGIApplication([
 	('/me', MeHandler),
 	('/updates', GetUpdatesHandler),
 	('/set_webhook', SetWebhookHandler),
 	('/webhook', WebhookHandler),
+	('/remind', ReminderHandler),
 ], debug=True)

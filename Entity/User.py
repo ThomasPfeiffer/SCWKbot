@@ -37,6 +37,9 @@ def delete(userID):
 def getKey(userID):
 	return ndb.Key(User, userID)
 
+def getAll():
+	return User.query().fetch()
+
 def setAdmin(userID, value):
 	user = get(userID)
 	if user:

@@ -21,6 +21,7 @@ class Event(ndb.Model):
 	name = ndb.StringProperty(required = True)
 	place = ndb.StringProperty()
 	date = ndb.DateTimeProperty(required = True)
+	reminderSent = ndb.BooleanProperty(default = False)
 
 	registeredUsers = ndb.KeyProperty(repeated = True)
 	cancelledUsers = ndb.KeyProperty(repeated = True)

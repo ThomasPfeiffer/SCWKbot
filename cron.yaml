@@ -1,0 +1,4 @@
+cron:
+- description: event reminder job
+  url: /remind
+  schedule: every 1 hours
