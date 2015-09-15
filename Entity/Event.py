@@ -12,6 +12,11 @@ DAY_DICT = {
 	'sonntag' : 6
 	}
 
+def dayStringForInt(number):
+	for key, val in DAY_DICT.items():
+			if val == number:
+				return key
+
 class Event(ndb.Model):
 	name = ndb.StringProperty(required = True)
 	place = ndb.StringProperty()
@@ -42,6 +47,9 @@ class Event(ndb.Model):
 		return "Name: " + self.name + "\n Ort: " + self.place + "\n Zeit: " + self.date.strftime("%d.%m.%Y %H:%M")
 
 def create(name, place, date):
+	check = getByDate(date)
+	if check:
+		raise ValueError('Event on given date exists already.')
 	event = Event(name=name, place=place, date = date)
 	event.put()
 	return event

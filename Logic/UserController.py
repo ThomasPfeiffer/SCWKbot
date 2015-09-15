@@ -16,6 +16,13 @@ def createOrUpdate(senderID, senderFirstName, chat_id):
 	return user
 
 def registerForEvent(user, additional):
+	if additional:
+		try:
+			date = datetime.strptime(additional, "%d.%m.%Y").date()
+			if date < datetime.now().date():
+						return u'Bitte ein Datum in der Zukunft angeben.'
+		except ValueError:
+			pass
 	result = Responder.parseEvent(user, additional)
 	if isinstance(result,Event.Event):
 			result.registerUser(user.key)
@@ -24,6 +31,13 @@ def registerForEvent(user, additional):
 		return result
 
 def cancelForEvent(user, additional):
+	if additional:
+		try:
+			date = datetime.strptime(additional, "%d.%m.%Y").date()
+			if date < datetime.now().date():
+						return u'Bitte ein Datum in der Zukunft angeben.'
+		except ValueError:
+			pass
 	result = Responder.parseEvent(user, additional)
 	if isinstance(result,Event.Event):
 			result.cancelUser(user.key)
@@ -32,8 +46,8 @@ def cancelForEvent(user, additional):
 		return result
 
 def infoForEvent(user, additional):
-	try:
-		if additional:
+	if additional:
+		try:
 			amount = int(additional)
 			events = Event.getNext(amount)
 			answer = u'Die nächsten ' + additional + ' Events: \n\n'
@@ -41,11 +55,25 @@ def infoForEvent(user, additional):
 				answer += e.toString() 
 				answer += u'\n\n'
 			return answer
-	except ValueError:
-		pass
+		except ValueError:
+			pass
 	result = Responder.parseEvent(user, additional)
 	if isinstance(result,Event.Event):
-		return result.toString()
+		answer = result.toString()
+		if user.admin:
+			answer = answer + u'\n Angemeldet (' + str(len(result.registeredUsers)) + u'): '
+			if result.registeredUsers:
+				registered = map(lambda userKey: userKey.get().firstName, result.registeredUsers)
+				answer = answer + ','.join(registered)
+			else:
+				answer = answer + u'-'
+			answer = answer + u'\n Abgemeldet (' + str(len(result.cancelledUsers)) + u'): '
+			if result.cancelledUsers:
+				cancelled = map(lambda userKey: userKey.get().firstName, result.cancelledUsers)
+				answer = answer + ','.join(cancelled)
+			else:
+				answer = answer + u'-'
+		return answer
 	if isinstance(result,basestring):
 		return result
 
@@ -59,15 +87,7 @@ def deleteUser(senderID, userID):
 		User.delete(userID)
 		return True
 
-def getDateByDay(day):
-	d = date.today()
-	i = 0
-	while d.weekday() != Event.DAY_DICT[day]:
-		 d += timedelta(1)
-		 i += 1
-		 if i > 10:
-		 	break
-	return d
+
 
 def setAdmin(senderID, userID, value):
 	if isAdmin(senderID):

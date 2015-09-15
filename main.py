@@ -129,34 +129,36 @@ class WebhookHandler(webapp2.RequestHandler):
 
 		# COMMANDS
 		if text.startswith('/'):
-			if text == '/start':
-				reply(u'Bot enabled')
-				setSetting('enabled', 'True')
-				return
-			if text == '/stop':
-				reply(u'Bot disabled')
-				setEnabled('enabled','False')
-				return
-			if text == '/enableUserRegistration':
-				reply(u'User registration enabled')
-				setSetting('userRegistration', 'True')
-				return
-			if text == '/disableUserRegistration':
-				reply(u'User registration disabled')
-				setSetting('userRegistration', 'False')
-				return
-			if text.startswith('/deleteUser '):
-				if UserController.deleteUser(str(fr['id']) , text.split()[1]):
-					reply(u'User ' + text.split()[1] + u' deleted.')
+			if UserController.isAdmin(str(fr['id'])):
+				if text == '/start':
+					reply(u'Bot enabled')
+					setSetting('enabled', 'True')
 					return
-			if text.startswith('/setAdmin'):
-				split = text.split()
-				if len(split) == 3:
-					if UserController.setAdmin(str(fr['id']), split[1], (split[2] == 'True')):
-						reply(u'User ' + split[1] + u' admin set to ' + split[2])
+				if text == '/stop':
+					reply(u'Bot disabled')
+					setEnabled('enabled','False')
+					return
+				if text == '/enableUserRegistration':
+					reply(u'User registration enabled')
+					setSetting('userRegistration', 'True')
+					return
+				if text == '/disableUserRegistration':
+					reply(u'User registration disabled')
+					setSetting('userRegistration', 'False')
+					return
+				if text.startswith('/deleteUser '):
+					if UserController.deleteUser(str(fr['id']) , text.split()[1]):
+						reply(u'User ' + text.split()[1] + u' deleted.')
 						return
-					else:
-						logging.warn("Set Admin request by " + str(fr['id']) + " not successful.")
+				if text.startswith('/setAdmin'):
+					split = text.split()
+					if len(split) == 3:
+						if UserController.setAdmin(str(fr['id']), split[1], (split[2] == 'True')):
+							reply(u'User ' + split[1] + u' admin set to ' + split[2])
+							return
+						else:
+							logging.warn("Set Admin request by " + str(fr['id']) + " not successful.")
+
 
 
 
@@ -164,6 +166,26 @@ class WebhookHandler(webapp2.RequestHandler):
 		if getSetting('enabled') != 'True':
 			logging.info('Bot is disabled')
 			return
+
+		# For dev
+		if '/setName' in text:
+			split = text.split()
+			senderFirstName = split[split.index('/setName')+1]
+			del split[split.index('/setName')+1]
+			split.remove('/setName')
+			text = ' '.join(split)
+			message['text']=text
+			message['from']['first_name']=senderFirstName
+
+
+		if '/setUser' in text:
+			split = text.split()
+			senderID = split[split.index('/setUser')+1]
+			del split[split.index('/setUser')+1]
+			split.remove('/setUser')
+			text = ' '.join(split)
+			message['text']=text
+			message['from']['id']=senderID
 
 		# CUSTOMIZE FROM HERE
 		rep = Responder.respondTo(message, chat_id)
