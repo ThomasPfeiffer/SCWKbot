@@ -9,8 +9,8 @@ import Entity.Event as Event
 import Responder
 
 
-def createOrUpdate(senderID, senderFirstName, chat_id):
-	user = User.update(senderID, senderFirstName, chat_id)
+def getOrCreate(senderID):
+	user = User.get(senderID)
 	if not user:
 		user = User.create(senderID, senderFirstName, chat_id)
 	return user
