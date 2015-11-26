@@ -65,10 +65,12 @@ def getSetting(setting):
 
 def send(msg, chat_id):
 			if msg:
+				replyKeyboardMakeup = {"keyboard": [['Anmelden'], ['Abmelden']], "one_time_keyboard": True} 
 				resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
 					'chat_id': str(chat_id),
 					'text': msg.encode("utf-8"),
 					'disable_web_page_preview': 'true',
+					'reply_markup': json.dumps(replyKeyboardMakeup)
 				})).read()
 			else:
 				logging.error('no msg specified')
