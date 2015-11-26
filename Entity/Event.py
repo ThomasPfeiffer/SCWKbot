@@ -26,6 +26,8 @@ class Event(ndb.Model):
 	registeredUsers = ndb.KeyProperty(repeated = True)
 	cancelledUsers = ndb.KeyProperty(repeated = True)
 
+	repetition = ndb.KeyProperty()
+
 	def registerUser(self, userKey):
 		if userKey in self.cancelledUsers:
 			self.cancelledUsers.remove(userKey)
@@ -45,13 +47,16 @@ class Event(ndb.Model):
 		return True
 
 	def toString(self):
-		return "Name: " + self.name + "\n Ort: " + self.place + "\n Zeit: " + self.date.strftime("%d.%m.%Y %H:%M")
+		if self.place:
+			return "Name: " + self.name + "\n Ort: " + self.place + "\n Zeit: " + self.date.strftime("%d.%m.%Y %H:%M")
+		else:
+			return "Name: " + self.name + "\n Zeit: " + self.date.strftime("%d.%m.%Y %H:%M")
 
-def create(name, place, date):
+def create(name, place, date, repetition=None):
 	check = getByDate(date)
 	if check:
 		raise ValueError('Event on given date exists already.')
-	event = Event(name=name, place=place, date = date)
+	event = Event(name=name, place=place, date = date, repetition = repetition)
 	event.put()
 	return event
 

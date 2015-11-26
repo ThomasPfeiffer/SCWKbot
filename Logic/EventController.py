@@ -16,20 +16,25 @@ def createSingleEvent(name, place, date):
 	event = Event.create(name, place, date)
 	return u'Event erstellt: \n' + event.toString()
 
-def createRepeatingEvent(name, place , day, time):
-	event = RepeatingEvent.getByDay(day)
-	if event:
-		return u'Am gegebenen Tag existiert bereits ein wiederholtes Event: \n' + event.toString()	
-	event = RepeatingEvent.create(name, place, day, time)
-	return u'Wiederholtes Event erstellt: \n' + event.toString()
+def createRepeatingEvent(name, place , day, time, endDate):
+	rep = RepeatingEvent.create(name, place, day, time, endDate)
+	events = rep.createEvents()
+	answer = u'Events an diesen Daten erstellt:'
+	for created in events[0]:
+		answer = answer + u'\n' + created.strftime("%d.%m.%Y")
+	if events[1]:
+		answer = answer + u'\nFolgende Daten übersprungen, da an diesen schon ein Event existiert:'
+		for skipped in events[1]:
+			answer = answer + u'\n' + skipped.strftime("%d.%m.%Y")
+	return answer
 
 def create(user, additional):
 	if not additional:
-		return u'Um ein Event zu erstellen müssen entsprechende Angaben gemacht werden: Name;Ort;Datum/Tag;Zeit)'
+		return u'Um ein Event zu erstellen müssen entsprechende Angaben gemacht werden: Name;[Ort];Datum/Tag;Zeit;[EndDatum])'
 
 	split = additional.split(';')
-	if len(split) != 4:
-		return u'Anzahl der Argumente ist Falsch! Es müssen 4 sein. (erstelle Name;Ort;Datum/Tag;Zeit)'
+	if (len(split) != 4) and (len(split) != 5):
+		return u'Anzahl der Argumente ist Falsch! Es müssen 4 oder 5 sein. (erstelle Name;[Ort];Datum/Tag;Zeit;[EndDatum])'
 
 	name = split[0]
 	if not name:
@@ -50,7 +55,13 @@ def create(user, additional):
 			if dateOrDayString:
 				dateOrDayString = dateOrDayString.lower()
 			day = Event.DAY_DICT[dateOrDayString]
-			return createRepeatingEvent(name, place, dateOrDayString, time)
+			try:
+				endDateString = split[4]
+				if endDateString:
+					endDate = datetime.strptime(endDateString, "%d.%m.%Y").date()
+				return createRepeatingEvent(name, place, day, time, endDate)
+			except ValueError as err2:
+				return u'EndDatum hat falsches Format.'
 		except KeyError:
 			return u'Als drittes Argument muss entweder ein Datum(TT.MM.JJJJ) oder ein Wochentag eingegeben werden'
 	return 'Fehler'
@@ -64,27 +75,3 @@ def delete(user, additional):
 			return u' Event ' + name + u' am ' + date.strftime("%d.%m.%Y %H:%M") + u' gelöscht.'
 	if isinstance(result,basestring):
 		return result
-
-
-def deleteRepeatingEvent(user, additional):
-	if additional:
-		additional = additional.lower()
-	else:
-		return u'Um ein wiederholtes Event zu löschen muss dessen Wochentag angegeben werden.' 
-	try:
-		Event.DAY_DICT[additional]
-	except KeyError:
-		return u'Um ein wiederholtes Event zu löschen muss dessen Wochentag angegeben werden.' + additional + u' ist nicht gültig.'
-	if RepeatingEvent.deleteByDay(additional):
-		return u'Wiederholtes event am ' + additional + u' gelöscht'
-	return u'Löschen fehlgeschlagen'
-
-def infoRepeatingEvents():
-	allReps = RepeatingEvent.getAll()
-	if allReps:
-		answer = u'Folgende wiederholte Events sind aktiv: '
-		for repEvent in allReps:
-			answer = answer + u'\n' + repEvent.toString()
-	else:
-		answer = u' Es sind keine wiederholten Events aktiv.'
-	return answer
