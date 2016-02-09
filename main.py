@@ -176,6 +176,13 @@ class WebhookHandler(webapp2.RequestHandler):
 					reply(u'User registration disabled')
 					setSetting('userRegistration', 'False')
 					return
+				if text == '/listUsers':
+					allUsers = Entity.User.getAll()
+					answer = u''
+					for user in allUsers:
+						answer = answer + user.firstName + u'\n'
+					reply(answer)
+					return
 				if text.startswith('/deleteUser '):
 					if UserController.deleteUser(str(fr['id']) , text.split()[1]):
 						reply(u'User ' + text.split()[1] + u' deleted.')

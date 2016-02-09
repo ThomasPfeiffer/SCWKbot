@@ -9,10 +9,8 @@ import Entity.Event as Event
 import Responder
 
 
-def getOrCreate(senderID):
+def get(senderID):
 	user = User.get(senderID)
-	if not user:
-		user = User.create(senderID, senderFirstName, chat_id)
 	return user
 
 def registerForEvent(user, additional):

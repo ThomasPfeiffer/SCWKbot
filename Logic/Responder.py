@@ -77,7 +77,10 @@ def respondTo(message, sender):
 		else:
 			answer = answer + u'Achtung, Wartung aktiv!\n'
 
-	user = UserController.getOrCreate(senderID)
+	user = UserController.get(senderID)
+	if not user:
+		user = User.create(senderID, senderFirstName, chat_id)
+	
 	textSplit = text.partition(' ')
 	command = textSplit[0].lower()
 	additional = None
