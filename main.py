@@ -83,7 +83,7 @@ class ReminderHandler(webapp2.RequestHandler):
 	def get(self):
 		event = Entity.Event.getNextEvent()
 		if event and not event.reminderSent:
-			if event.date <= datetime.datetime.now() + datetime.timedelta(hours=24):
+			if event.date <= datetime.datetime.now() + datetime.timedelta(hours=26):
 				allUsers = Entity.User.getAll()
 				for user in allUsers:
 					if user.key not in event.registeredUsers and user.key not in event.cancelledUsers:
