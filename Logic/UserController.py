@@ -24,7 +24,9 @@ def registerForEvent(user, additional):
 	result = Responder.parseEvent(user, additional)
 	if isinstance(result,Event.Event):
 			result.registerUser(user.key)
-			return user.firstName + u' für ' + result.name + u' am ' + result.date.strftime("%d.%m.%Y %H:%M") + u' angemeldet.'
+			answer = user.firstName + u' für ' + result.name + u' am ' + result.date.strftime("%d.%m.%Y %H:%M") + u' angemeldet.'
+			answer = answer + list_registered_cancelled(result)
+			return answer
 	if isinstance(result,basestring):
 		return result
 
@@ -39,7 +41,9 @@ def cancelForEvent(user, additional):
 	result = Responder.parseEvent(user, additional)
 	if isinstance(result,Event.Event):
 			result.cancelUser(user.key)
-			return user.firstName + u' für ' + result.name + u' am ' + result.date.strftime("%d.%m.%Y %H:%M") + u' abgemeldet.'
+			answer = user.firstName + u' für ' + result.name + u' am ' + result.date.strftime("%d.%m.%Y %H:%M") + u' abgemeldet.'
+			answer = answer + list_registered_cancelled(result)
+			return answer
 	if isinstance(result,basestring):
 		return result
 
@@ -63,22 +67,25 @@ def infoForEvent(user, additional):
 	result = Responder.parseEvent(user, additional)
 	if isinstance(result,Event.Event):
 		answer = result.toString()
-		if user.admin:
-			answer = answer + u'\n Angemeldet (' + str(len(result.registeredUsers)) + u'): '
-			if result.registeredUsers:
-				registered = map(lambda userKey: userKey.get().firstName, result.registeredUsers)
-				answer = answer + ','.join(registered)
-			else:
-				answer = answer + u'-'
-			answer = answer + u'\n Abgemeldet (' + str(len(result.cancelledUsers)) + u'): '
-			if result.cancelledUsers:
-				cancelled = map(lambda userKey: userKey.get().firstName, result.cancelledUsers)
-				answer = answer + ','.join(cancelled)
-			else:
-				answer = answer + u'-'
+		answer = answer + list_registered_cancelled(result)
 		return answer
 	if isinstance(result,basestring):
 		return result
+
+def list_registered_cancelled(event):
+	result = u'\n Angemeldet (' + str(len(event.registeredUsers)) + u'): '
+	if event.registeredUsers:
+		registered = map(lambda userKey: userKey.get().firstName, event.registeredUsers)
+		result = result + ','.join(registered)
+	else:
+		result = result + u'-'
+	result = result + u'\n Abgemeldet (' + str(len(event.cancelledUsers)) + u'): '
+	if event.cancelledUsers:
+		cancelled = map(lambda userKey: userKey.get().firstName, event.cancelledUsers)
+		result = result + ','.join(cancelled)
+	else:
+		result = result + u'-'
+	return result
 
 def isAdmin(userID):
 	user = User.get(userID)

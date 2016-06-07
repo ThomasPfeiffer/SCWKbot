@@ -64,20 +64,25 @@ def getSetting(setting):
 # ================================
 
 def send(msg, chat_id):
-			if msg:
-				replyKeyboardMakeup = {"keyboard": [['Anmelden'], ['Abmelden']], "one_time_keyboard": True} 
-				resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
-					'chat_id': str(chat_id),
-					'text': msg.encode("utf-8"),
-					'disable_web_page_preview': 'true',
-					'reply_markup': json.dumps(replyKeyboardMakeup)
-				})).read()
-			else:
-				logging.error('no msg specified')
-				resp = None
-
+	if msg:
+		replyKeyboardMakeup = {"keyboard": [['Anmelden'], ['Abmelden']], "one_time_keyboard": True} 
+		try:
+			resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+				'chat_id': str(chat_id),
+				'text': msg.encode("utf-8"),
+				'disable_web_page_preview': 'true',
+				'reply_markup': json.dumps(replyKeyboardMakeup)
+			})).read()
 			logging.info('send response:')
 			logging.info(resp)
+		except urllib2.HTTPError, err:
+			if err.code == 403:
+				logging.error('Error 403: ' + str(err.reason) + ' while sending to ' + str(chat_id))
+			else:
+				raise err
+	else:
+		logging.error('no msg specified')
+		resp = None
 
 class ReminderHandler(webapp2.RequestHandler):
 	def get(self):
@@ -176,11 +181,11 @@ class WebhookHandler(webapp2.RequestHandler):
 					reply(u'User registration disabled')
 					setSetting('userRegistration', 'False')
 					return
-				if text == '/listUsers':
+				if text.lower() == '/listusers':
 					allUsers = Entity.User.getAll()
 					answer = u''
 					for user in allUsers:
-						answer = answer + user.firstName + u'\n'
+						answer = answer + user.firstName + u'\t' + user.chatID + u'\n'
 					reply(answer)
 					return
 				if text.startswith('/deleteUser '):
