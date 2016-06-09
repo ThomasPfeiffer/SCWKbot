@@ -106,14 +106,12 @@ def respondTo(message, sender):
 			return  answer + EventController.create(user, additional)
 		if command.startswith(u'lösch'):
 			return  answer + EventController.delete(user, additional)
-		if command.startswith(u'updateRepeating'):
+		if command.startswith(u'updaterepeating'):
 			return  answer + EventController.updateRepeating(user, additional)
 		if command.startswith(u'fahrerliste'):
 			return  answer + DriverController.listByUser(additional)
-	
-
-	
 	return answer + getHelpText(user)
+	
 
 def getHelpText(user):
 	answer=  u'Folgende befehle sind möglich: \n\t an -> anmelden \n\t ab -> abmelden \n\t info (x)-> Informationen zu einem (oder x) Event(s) \n\n Zusätzlich kann ein bestimmter Tag (z.B. "Montag") oder ein Datum (TT.MM.JJJJ) angegeben werden. Wird nichts angegeben, wird das nächste Training/Spiel genommen.\n\n Um Fahrten einzutragen fahrt TT.MM.JJJJ mit dem Datum des jeweiligen spiels eingeben. Einträge können mit fahrtlöschen TT.MM.JJJJ wieder gelöscht werden.'

@@ -29,11 +29,11 @@ def createRepeatingEvent(name, place , day, time, endDate):
 	return answer
 
 def updateRepeating(user, additional):
-	rep = RepeatingEvent.get(int(additional.split[0]))
+	rep = RepeatingEvent.get(int(additional.split()[0]))
 	events = Event.getByRepeating(rep.key)
 	i = 0
 	for event in events:
-		event.date = event.date + timedelta(minutes=int(additional.split[1]))
+		event.date = event.date + timedelta(minutes=int(additional.split()[1]))
 		event.put()
 		i = i +1
 	return str(i) + ' events updated'
