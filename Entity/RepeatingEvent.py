@@ -30,6 +30,10 @@ def create(name, place, day, time, endDate):
 	repetition.put()
 	return repetition
 
+def get(eventID):
+	return Repetition.get_by_id(eventID)
+
+
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
     if days_ahead <= 0: # Target day already happened this week

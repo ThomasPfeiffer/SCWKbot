@@ -83,4 +83,8 @@ def getNext(amount):
 def get(eventID):
 	return Event.get_by_id(eventID)
 
+def getByRepeating(repEventKey):
+	events = Event.query(Event.repetition >= repEventKey).fetch()
+	return events
+
 

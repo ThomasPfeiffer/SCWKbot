@@ -28,6 +28,16 @@ def createRepeatingEvent(name, place , day, time, endDate):
 			answer = answer + u'\n' + skipped.strftime("%d.%m.%Y")
 	return answer
 
+def updateRepeating(user, additional):
+	rep = RepeatingEvent.get(int(additional.split[0]))
+	events = Event.getByRepeating(rep.key)
+	i = 0
+	for event in events:
+		event.date = event.date + timedelta(minutes=int(additional.split[1]))
+		event.put()
+		i = i +1
+	return str(i) + ' events updated'
+
 def create(user, additional):
 	if not additional:
 		return u'Um ein Event zu erstellen müssen entsprechende Angaben gemacht werden: Name;[Ort];Datum/Tag;Zeit;[EndDatum])'

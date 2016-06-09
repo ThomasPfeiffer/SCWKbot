@@ -106,6 +106,8 @@ def respondTo(message, sender):
 			return  answer + EventController.create(user, additional)
 		if command.startswith(u'lösch'):
 			return  answer + EventController.delete(user, additional)
+		if command.startswith(u'updateRepeating'):
+			return  answer + EventController.updateRepeating(user, additional)
 		if command.startswith(u'fahrerliste'):
 			return  answer + DriverController.listByUser(additional)
 	
